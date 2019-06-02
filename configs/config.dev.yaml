@@ -1,0 +1,15 @@
+run_dir: "scratch/devprocessed"
+max_concurrent_downloads: 2
+is_dev: True
+# turn_char_limit: 100
+# sampling_n_groups: 4
+# sampling_n_per_group: 4
+manual_dates:
+  - "2018-02"
+all_subreddits:
+  - askreddit
+  - todayilearned
+  - toronto
+  - investing
+held_out_subreddits:
+  - investing
