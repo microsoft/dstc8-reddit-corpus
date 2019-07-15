@@ -132,6 +132,7 @@ class RawConfig(BaseModel):
     'RC_2018-08.xz': 'b8939ecd280b48459c929c532eda923f3a2514db026175ed953a7956744c6003',
     'RC_2018-10.xz': 'cadb242a4b5f166071effdd9adbc1d7a78c978d3622bc01cd0f20d3a4c269bd0',
   }
+  delete_intermediate_data: bool = False
 
 
 class RedditConfig:
@@ -139,11 +140,15 @@ class RedditConfig:
   _cfg = None
 
   @classmethod
-  def initialize(cls, cfgyaml=None):
+  def initialize(cls, cfgyaml=None, extra_config=None):
     kwargs = {}
     if cfgyaml:
       with open(cfgyaml, 'r', encoding='utf-8') as f:
         kwargs = yaml.load(f, Loader=yaml.FullLoader)
+
+    # Will override any preset and anything from the config yaml
+    if extra_config:
+      kwargs.update(extra_config)
 
     kwargs['all_subreddits'] = set(kwargs.get('all_subreddits', []))
     kwargs['held_out_subreddits'] = set(kwargs.get('held_out_subreddits', []))

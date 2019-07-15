@@ -14,10 +14,11 @@ from zipfile import ZipFile, ZIP_DEFLATED
 
 from dstc8_reddit.config import RedditConfig, Subset
 from dstc8_reddit.tasks.sampling import SampleDialogues
+from dstc8_reddit.util import delete_requires
 
 
 class SplitDialogues(luigi.Task):
-  """ This is a heavy task, but needed to do the splitting required for reaggregation """
+  """ This is a heavy task, but needed to do the splitting required for reaggregation. """
   date = luigi.Parameter()
 
   def __init__(self, *args, **kwargs):
@@ -92,9 +93,16 @@ class SplitDialogues(luigi.Task):
           if key in buffers and len(buffers[key]) > 0:
             outfile.write(''.join(buffers[key]))
 
+  def on_success(self):
+    if RedditConfig().delete_intermediate_data:
+      delete_requires(self.requires())
+
 
 class MergeDialoguesOverDates(luigi.Task):
-  """ Decompresses because haven't tested thread safety in zip """
+  """
+  Decompresses because haven't tested thread safety in zip.
+  Also cannot call `delete_requires` in `on_success()` since there are cross-dependencies.
+  """
   split = luigi.IntParameter()
   subreddit = luigi.Parameter()
 
@@ -155,3 +163,14 @@ class ZipDataset(luigi.Task):
           f.write('\n'.join([make_json_for_subreddit(t) for t in sorted(tasks)]) + '\n')
 
       archive.close()
+
+  def on_success(self):
+    if RedditConfig().delete_intermediate_data:
+      delete_requires(self.requires())
+
+    parent_reqs = self.requires()
+    if not isinstance(parent_reqs, list):
+      parent_reqs = [parent_reqs]
+
+    for r in parent_reqs:
+      delete_requires(r.requires())

@@ -10,6 +10,7 @@ from numpy import random
 from dstc8_reddit.config import RedditConfig
 from dstc8_reddit.constants import Patterns
 from dstc8_reddit.tasks.construction import BuildDialogues
+from dstc8_reddit.util import delete_requires
 from dstc8_reddit.validation import SessionItem
 
 
@@ -214,3 +215,7 @@ class SampleDialogues(luigi.Task):
       logging.debug(f" > [{self.date}] # DLGS: before sample={len(dlgs)}, after sample={len(sampled_dlgs)}")
       lens = [len(d) for d in sampled_dlgs]
       logging.debug(f" > [{self.date}] DLG LENGTHS: max={max(lens)}, min={min(lens)}, avg={sum(lens) / len(lens):2.2f}")
+
+  def on_success(self):
+    if RedditConfig().delete_intermediate_data:
+      delete_requires(self.requires())

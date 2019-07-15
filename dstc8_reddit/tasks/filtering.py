@@ -4,7 +4,7 @@ import rapidjson as json
 from dstc8_reddit.config import RedditConfig
 from dstc8_reddit.constants import Patterns, SUBMISSION_ID_PREFIX
 from dstc8_reddit.tasks.download import DownloadRawFile
-from dstc8_reddit.util import process_file_linewise, SubmissionJsonOutputter, CommentJsonOutputter
+from dstc8_reddit.util import process_file_linewise, SubmissionJsonOutputter, CommentJsonOutputter, delete_requires
 
 
 class RawSubmissionFilterer:
@@ -155,6 +155,10 @@ class FilterRawSubmissions(luigi.Task):
         buffer_size=RedditConfig().dump_interval
       )
 
+  def on_success(self):
+    if RedditConfig().delete_intermediate_data:
+      delete_requires(self.requires())
+
 
 class FilterRawComments(luigi.Task):
   date = luigi.Parameter()
@@ -182,3 +186,7 @@ class FilterRawComments(luigi.Task):
         outputter=CommentJsonOutputter(),
         buffer_size=RedditConfig().dump_interval
       )
+
+  def on_success(self):
+    if RedditConfig().delete_intermediate_data:
+      delete_requires(self.requires())

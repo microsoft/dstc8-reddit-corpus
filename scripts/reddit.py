@@ -40,8 +40,18 @@ def download(workers, config, log_level):
 @click.option('-c', '--config', type=click.Path(dir_okay=False, file_okay=True, exists=True),
               default='configs/config.prod.yaml')
 @click.option('-l', '--log-level', default='ERROR')
-def generate(workers, config, log_level):
-  RedditConfig.initialize(config)
+@click.option('--small', is_flag=True,
+              help='If set, will use reduced storage by deleting intermediate data')
+def generate(workers, config, log_level, small):
+
+  extra_config = {}
+
+  if small:
+    extra_config.update(dict(delete_intermediate_data=True,
+                             max_concurrent_downloads=1))
+
+  RedditConfig.initialize(config, extra_config)
+
   print(RedditConfig())
 
   luigi.configuration.get_config().set('resources', 'max_concurrent_downloads',
