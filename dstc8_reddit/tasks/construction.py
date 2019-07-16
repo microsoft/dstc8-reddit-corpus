@@ -5,6 +5,7 @@ import rapidjson as json
 
 from dstc8_reddit.config import RedditConfig
 from dstc8_reddit.tasks.filtering import FilterRawSubmissions, FilterRawComments
+from dstc8_reddit.util import delete_requires
 
 
 class BuildDialogues(luigi.Task):
@@ -113,3 +114,7 @@ class BuildDialogues(luigi.Task):
       if dlgs_to_write:
         f.write(''.join(dlgs_to_write))
       f.close()
+
+  def on_success(self):
+    if RedditConfig().delete_intermediate_data:
+      delete_requires(self.requires())

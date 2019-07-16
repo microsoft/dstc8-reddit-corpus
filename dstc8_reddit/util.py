@@ -2,6 +2,7 @@ import bz2
 import gzip
 import logging
 import lzma
+import os
 import rapidjson as json
 
 from dstc8_reddit.constants import Patterns, OUTPUT_FIELDS, SELF_BREAK_TOKEN, SUBMISSION_ID_PREFIX, COMMENT_ID_PREFIX
@@ -90,3 +91,19 @@ def process_file_linewise(
   if out_ids_filepath:
     with make_file_handle(out_ids_filepath, 'wt') as ids_outfile:
       ids_outfile.write('\n'.join(list(ids_set)) + '\n')
+
+
+def delete_requires(requires):
+  if not isinstance(requires, list):
+    requires = [requires]
+
+  for req in requires:
+    outputs = req.output()
+    if not isinstance(outputs, list):
+      outputs = [outputs]
+
+    for out in outputs:
+      fp = out.path
+      if os.path.exists(fp):
+        logging.info(f"[delete] Removed `{fp}`")
+        os.remove(fp)

@@ -13,8 +13,9 @@ This package is based on [Luigi](https://luigi.readthedocs.io/en/stable/index.ht
 ### Requirements
 
 - Python 3.5+
-- **~210 GB** space for constructing the dialogues
+- **~210 GB** space for constructing the dialogues with default settings
   - Final zip is only **4.2 GB** though
+  - [You can get away with less disk space, ~30GB](https://github.com/microsoft/dstc8-reddit-corpus/#i-dont-have-enough-disk-space)
 - An internet connection
 - 24-72 hours to generate the data
   - Depends on speed of internet connection, how many cores, how much RAM 
@@ -155,6 +156,11 @@ The raw data takes up the most space (>144 GB) but also takes the longest time t
 
 Filtering and building the dialogues discards a lot of the data, so only keeping things in the `dialogues*` directories is safe.
 
+**If you just want the final dataset you can use the `--small` option to delete raw and intermediate data the dataset is generated, e.g.**
+
+```bash
+python scripts/reddit.py generate --small
+```
 
 #### Windows
 
