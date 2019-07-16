@@ -5,7 +5,7 @@ import luigi
 from multiprocessing import cpu_count
 
 from dstc8_reddit.config import RedditConfig
-from dstc8_reddit.tasks import DownloadRawFile, ZipDataset
+from dstc8_reddit.tasks import DownloadRawFile, ZipDataset, BuildDialogues
 
 
 @click.group()
@@ -48,7 +48,7 @@ def generate(workers, config, log_level, small):
 
   if small:
     extra_config.update(dict(delete_intermediate_data=True,
-                             max_concurrent_downloads=1))
+                             max_concurrent_downloads=2))
 
   RedditConfig.initialize(config, extra_config)
 
@@ -60,6 +60,16 @@ def generate(workers, config, log_level, small):
                                        str(RedditConfig().max_concurrent_build))
   luigi.configuration.get_config().set('resources', 'max_concurrent_sample',
                                        str(RedditConfig().max_concurrent_sample))
+
+  if small:
+    for d in RedditConfig().make_all_dates():
+      luigi.interface.build(
+        [BuildDialogues(d)],
+        workers=workers,
+        local_scheduler=True,
+        log_level=log_level,
+        detailed_summary=True,
+      )
 
   result = luigi.interface.build(
     [ZipDataset()],
