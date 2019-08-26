@@ -135,7 +135,7 @@ class ZipDataset(luigi.Task):
 
   def run(self):
     with self.output().temporary_path() as zip_path:
-      archive = ZipFile(zip_path, 'w', compression=ZIP_DEFLATED, compresslevel=9)
+      archive = ZipFile(zip_path, 'w', compression=ZIP_DEFLATED)
       for src in self.input():
         if os.stat(src.path).st_size == 0:
           continue
