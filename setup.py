@@ -38,7 +38,7 @@ setup(
   classifiers=[
       'Programming Language :: Python :: 3',
   ],
-  python_requires='>=3.5',
+  python_requires='>=3.6',
   install_requires=INSTALL_REQUIRES,
   tests_require=TEST_REQUIRES,
   extras_require=dict(
